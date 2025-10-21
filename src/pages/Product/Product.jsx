@@ -6,7 +6,7 @@ import Input from '../../components/ui/Input';
 import Table from '../../components/ui/Table';
 import Create from './Create';
 import EditForm from './Edit';
-import Delete from './DeleteStyle';
+import Delete from './Delete';
 import api from '../../services/auth';
 import { 
   Plus, 
@@ -632,8 +632,8 @@ const Product = () => {
         <Delete
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}
-          styleId={selectedProductId}
-          onStyleDelete={handleProductDelete}
+          productId={selectedProductId}
+          onDataDelete={handleProductDelete}
         />
         
         {/* Create Product Modal */}

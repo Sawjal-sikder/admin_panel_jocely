@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '../../services/auth';
+import api from '../../services/auth';
 import { AlertTriangle, X } from 'lucide-react';
 
-const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
+const Delete = ({ isOpen, onClose, productId, onDataDelete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleDelete = async () => {
-    if (!styleId) return;
+    if (!productId) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      await axios.delete(`${API_BASE_URL}/ai/trade/styles/${styleId}/`, {
+      await api.delete(`/shop/products/${productId}/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
       });
 
-      // Call the callback to refresh the styles list
-      onStyleDelete(styleId);
+      // Call the callback to refresh the Product list
+      onDataDelete(productId);
       onClose();
     } catch (error) {
-      console.error('Error deleting style:', error);
+      console.error('Error deleting product:', error);
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
                           error.message || 
-                          'Failed to delete style';
+                          'Failed to delete product';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -55,8 +55,8 @@ const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-900">
-                Delete Trading Style
-                <p className="text-sm text-gray-500">Trade style ID: {styleId}</p>
+                Delete Product
+                <p className="text-sm text-gray-500">Product ID: {productId}</p>
               </h3>
             </div>
           </div>
@@ -72,7 +72,7 @@ const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
         {/* Content */}
         <div className="p-6">
           <div className="text-sm text-gray-500 mb-4">
-            Are you sure you want to delete this trading style? This action cannot be undone.
+            Are you sure you want to delete this product? This action cannot be undone.
           </div>
           
           {error && (
@@ -85,7 +85,7 @@ const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-yellow-700">
-                <strong>Warning:</strong> This will permanently delete the trading style and cannot be recovered.
+                <strong>Warning:</strong> This will permanently delete the product and cannot be recovered.
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@ const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
                 Deleting...
               </div>
             ) : (
-              'Delete Style'
+              'Delete Product'
             )}
           </button>
         </div>
@@ -125,4 +125,4 @@ const DeleteStyle = ({ isOpen, onClose, styleId, onStyleDelete }) => {
   );
 };
 
-export default DeleteStyle;
+export default Delete;

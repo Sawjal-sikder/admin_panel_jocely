@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../components/ui/Button';
 import api, { API_BASE_URL } from '../../services/auth';
-import axios from 'axios';
 import { X, Plus } from 'lucide-react';
 
 const Edit = ({ isOpen, onClose, product, onProductUpdate }) => {
@@ -485,7 +484,7 @@ const Edit = ({ isOpen, onClose, product, onProductUpdate }) => {
                 placeholder="$ 00.0"
                 required
                 min="0"
-                step="1"
+                step="0.01"
               />
             </div>
             <div>
@@ -501,7 +500,7 @@ const Edit = ({ isOpen, onClose, product, onProductUpdate }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="$ 00.0"
                 min="0"
-                step="1"
+                step="0.01"
               />
             </div>
             <div>
@@ -519,6 +518,24 @@ const Edit = ({ isOpen, onClose, product, onProductUpdate }) => {
                 placeholder="Enter type of product"
                 
               />
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Product is Active
+                </span>
+              </label>
+              <p className="text-xs text-gray-500 mt-1">
+                Active products are visible to customers
+              </p>
             </div>
             {/* Image Upload Fields */}
             <div className="space-y-4">
