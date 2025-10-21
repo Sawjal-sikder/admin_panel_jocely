@@ -9,7 +9,7 @@ import Plan from './pages/Subscription/Plan';
 import Subscription from './pages/Subscription_list/Subscription';
 import Product from './pages/Product/Product';
 import TreadingStrategies from './pages/treadingStrategies/Strategies';
-import Categories from './pages/Categories';
+import Categories from './pages/category/Categories';
 import Settings from './pages/settings/Settings';
 
 function App() {
