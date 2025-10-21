@@ -4,9 +4,9 @@ import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Table from '../../components/ui/Table';
-import CreateStyle from './CreateStyle';
-import EditStyle from './EditStyle';
-import DeleteStyle from './DeleteStyle';
+import Create from './Create';
+import EditForm from './Edit';
+import Delete from './DeleteStyle';
 import api from '../../services/auth';
 import { 
   Plus, 
@@ -69,7 +69,6 @@ const Product = () => {
       setLoading(true);
       setError(null);
 
-      console.log('Fetching products from API...', { page, limit, search }); // Debug log
 
       // First try the basic endpoint to see if it works
       let response;
@@ -100,7 +99,6 @@ const Product = () => {
 
       // With Axios, the data is directly available in response.data
       const data = response.data;
-      console.log('API Response:', data); // Debug log
 
       // Handle pagination data from API response
       const rawProductsData = data.results || data.data || (Array.isArray(data) ? data : []);
@@ -116,7 +114,6 @@ const Product = () => {
         const endIndex = startIndex + limit;
         paginatedData = rawProductsData.slice(startIndex, endIndex);
         actualCount = rawProductsData.length;
-        console.log('Using client-side pagination:', { startIndex, endIndex, actualCount });
       }
       
       // Calculate total pages
@@ -127,10 +124,8 @@ const Product = () => {
       setTotalPages(calculatedTotalPages);
       setCurrentPage(page);
       
-      console.log('Pagination info:', { count: actualCount, calculatedTotalPages, page, limit }); // Debug log
       
       if (!paginatedData || paginatedData.length === 0) {
-        console.log('No products found in API response');
         setProducts([]);
         if (page === 1) {
           setError('No products found');
@@ -140,11 +135,9 @@ const Product = () => {
       
       // Transform API data to match UI expectations
       const transformedProducts = paginatedData.map(transformProductData);
-      console.log('Transformed Products:', transformedProducts); // Debug log
-      
       setProducts(transformedProducts);
     } catch (error) {
-      console.error('Fetch Products Error:', error); // Debug log
+      console.error('Fetch Products Error:', error);
       console.error('Error details:', {
         message: error.message,
         status: error.response?.status,
@@ -153,8 +146,6 @@ const Product = () => {
       
       setError(`API Error: ${error.response?.data?.message || error.message}`);
       
-      // For testing, let's add some sample data if API fails
-      console.log('API failed, adding sample data for testing...');
       
       // Generate sample data based on requested limit
       const sampleProducts = Array.from({ length: Math.min(limit, 5) }, (_, i) => ({
@@ -196,10 +187,6 @@ const Product = () => {
 
   // Debug: Log the current state
   useEffect(() => {
-    console.log('Current products state:', products);
-    console.log('Loading state:', loading);
-    console.log('Error state:', error);
-    console.log('Pagination state:', { currentPage, totalPages, totalCount, itemsPerPage });
   }, [products, loading, error, currentPage, totalPages, totalCount, itemsPerPage]);
 
   // Since we're doing server-side pagination and search, we don't need client-side filtering
@@ -633,16 +620,16 @@ const Product = () => {
         )}
 
         {/* Edit Product Modal */}
-        <EditStyle
+        <EditForm
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}
-          style={selectedProduct}
-          onStyleUpdate={handleProductUpdate}
+          product={selectedProduct}
+          onProductUpdate={handleProductUpdate}
           useLocalUpdate={false}
         />
         
         {/* Delete Product Modal */}
-        <DeleteStyle
+        <Delete
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}
           styleId={selectedProductId}
@@ -650,10 +637,10 @@ const Product = () => {
         />
         
         {/* Create Product Modal */}
-        <CreateStyle
+        <Create
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}
-          onStyleCreate={() => fetchProducts(currentPage, itemsPerPage)}
+          onCreate={() => fetchProducts(currentPage, itemsPerPage)}
         />
       </div>
     </Layout>
