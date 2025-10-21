@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Table from '../../components/ui/Table';
 import EditUser from './EditUser';
-import { API_BASE_URL } from '../../services/auth';
+import api,{ API_BASE_URL } from '../../services/auth';
 import { 
   Plus, 
   Search, 
@@ -48,31 +48,16 @@ const Users = () => {
     try {
       setLoading(true);
       setError(null);
-
-      const response = await fetch(`${API_BASE_URL}/auth/user/list/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Assuming API returns users in a 'users' field or directly as array
-      const rawUsersData = Array.isArray(data) ? data : data.users || data.data || [];
-      
-      // Transform API data to match UI expectations
-      const transformedUsers = rawUsersData.map(transformUserData);
-      
+      const response = await api.get(`/auth/user/list/`);
+      const data = response.data;
+      const rawUsersData = Array.isArray(data) ? data : data.users || data.data || data.results || [];
+      const transformedUsers = rawUsersData.map(transformUserData);      
       setUsers(transformedUsers);
     } catch (error) {
-      setError(`API Error: ${error.message}`);
-      setUsers([]); // Set empty array instead of dummy data
+      console.error('API Error:', error);
+      console.error('Error response:', error.response?.data);
+      setError(`API Error: ${error.response?.data?.message || error.message}`);
+      setUsers([]); 
     } finally {
       setLoading(false);
     }
