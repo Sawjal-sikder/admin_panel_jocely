@@ -15,7 +15,8 @@ import {
   Bell,
   Search,
   CandlestickChart,
-  TrendingUp
+  TrendingUp,
+  ShoppingBag
 } from 'lucide-react';
 
 const navigation = [
@@ -23,9 +24,9 @@ const navigation = [
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Subscription plan', href: '/subscription_plan', icon: CreditCard },
   { name: 'Subscription', href: '/subscription_list', icon: CreditCard },
-  { name: 'Trading Style', href: '/tradeing-style', icon: CandlestickChart },
-  { name: 'Trading Strategies', href: '/tradeing-strategies', icon: TrendingUp },
-  // { name: 'Categories', href: '/categories', icon: Folder },
+  // { name: 'Trading Strategies', href: '/tradeing-strategies', icon: TrendingUp },
+  { name: 'Categories', href: '/categories', icon: Folder },
+  { name: 'Products', href: '/products', icon: ShoppingBag },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

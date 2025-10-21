@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/users/Users';
 import Plan from './pages/Subscription/Plan';
 import Subscription from './pages/Subscription_list/Subscription';
-import TreadingStyle from './pages/treadingStyle/Style';
+import Product from './pages/Product/Product';
 import TreadingStrategies from './pages/treadingStrategies/Strategies';
 import Categories from './pages/Categories';
 import Settings from './pages/settings/Settings';
@@ -52,10 +52,10 @@ function App() {
               }
             />
             <Route
-              path="/tradeing-style"
+              path="/products"
               element={
                 <ProtectedRoute>
-                  <TreadingStyle />
+                  <Product />
                 </ProtectedRoute>
               }
             />
