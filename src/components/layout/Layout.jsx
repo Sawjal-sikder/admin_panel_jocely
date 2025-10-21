@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import Logo from '../../assets/logo/logo.png';
 import {
   LayoutDashboard,
   Users,
@@ -129,7 +130,7 @@ const SidebarContent = ({ navigation, currentPath }) => {
       <div className="flex items-center h-16 flex-shrink-0 px-4">
         {/* Company logo/icon and name */}
         <div className="flex items-center space-x-2">
-          <svg
+          {/* <svg
             className="h-8 w-8 text-primary-600"
             viewBox="0 0 32 32"
             fill="currentColor"
@@ -144,8 +145,10 @@ const SidebarContent = ({ navigation, currentPath }) => {
               strokeLinejoin="round"
               fill="none"
             />
-          </svg>
-          <span className="text-xl font-bold text-gray-900 tracking-tight">Trade Pilot</span>
+          </svg> */}
+          <span className="text-xl font-bold text-gray-900 tracking-tight">
+            <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
+          </span>
         </div>
       </div>
       <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">

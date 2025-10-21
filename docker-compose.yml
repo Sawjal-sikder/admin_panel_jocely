@@ -3,10 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: chart_ai_dashboard:dev
-    container_name: chart_ai_dashboard
+    image: jocely_dashboard:dev
+    container_name: jocely_dashboard
     ports:
-      - "5174:5174"
+      - "14006:14006"
     volumes:
       - .:/app
       - /app/node_modules
