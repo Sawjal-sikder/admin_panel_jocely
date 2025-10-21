@@ -43,8 +43,26 @@ const Subscription = () => {
         }
 
         const data = await response.json();
-        // console.log('Fetched Subscriptions:', data);
-        setSubscriptions(data);
+        
+        // Ensure data is an array - handle different response formats
+        let subscriptionArray = [];
+        if (Array.isArray(data)) {
+          subscriptionArray = data;
+        } else if (data && Array.isArray(data.results)) {
+          // Handle paginated response
+          subscriptionArray = data.results;
+        } else if (data && Array.isArray(data.data)) {
+          // Handle data wrapped in a data property
+          subscriptionArray = data.data;
+        } else if (data && Array.isArray(data.subscriptions)) {
+          // Handle subscriptions wrapped in a subscriptions property
+          subscriptionArray = data.subscriptions;
+        } else {
+          console.warn('Unexpected API response format:', data);
+          subscriptionArray = [];
+        }
+        
+        setSubscriptions(subscriptionArray);
         setError(null);
       } catch (err) {
         console.error('Error fetching subscriptions:', err);
@@ -76,16 +94,16 @@ const Subscription = () => {
     setSelectedSubscription(null);
   };
 
-  const filteredSubscriptions = subscriptions.filter(subscription => {
-    const matchesSearch = subscription.plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         subscription.plan.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         subscription.stripe_customer_id.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredSubscriptions = Array.isArray(subscriptions) ? subscriptions.filter(subscription => {
+    const matchesSearch = subscription.plan?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         subscription.plan?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         subscription.stripe_customer_id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'active' && subscription.status === 'active') ||
                          (filterStatus === 'trialing' && subscription.status === 'trialing') ||
                          (filterStatus === 'inactive' && subscription.status === 'inactive');
     return matchesSearch && matchesStatus;
-  });
+  }) : [];
 
   const getStatusBadge = (active) => {
     return active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
@@ -170,10 +188,10 @@ const Subscription = () => {
               </div>
             </div>
 
-            <Button className="flex items-center" disabled={loading}>
+            {/* <Button className="flex items-center" disabled={loading}>
               <Plus className="h-4 w-4 mr-2" />
               Add Subscription
-            </Button>
+            </Button> */}
           </div>
         </Card>
 
