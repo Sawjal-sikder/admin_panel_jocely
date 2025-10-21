@@ -56,11 +56,15 @@ const Plan = () => {
         }
 
         const data = await response.json();
-        setPlans(data);
+        
+        // Ensure data is an array
+        const plansArray = Array.isArray(data) ? data : (data.results || data.plans || []);
+        setPlans(plansArray);
         setError(null);
       } catch (err) {
         console.error('Error fetching plans:', err);
         setError(err.message);
+        setPlans([]); // Ensure plans is always an array even on error
       } finally {
         setLoading(false);
       }
@@ -86,9 +90,9 @@ const Plan = () => {
     setSelectedPlan(null);
   };
 
-  const filteredPlans = plans.filter(plan => {
-    const matchesSearch = plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plan.description.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPlans = (Array.isArray(plans) ? plans : []).filter(plan => {
+    const matchesSearch = plan.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         plan.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'active' && plan.active) ||
                          (filterStatus === 'inactive' && !plan.active);
