@@ -324,19 +324,7 @@ const Product = () => {
             </div>
           )}
 
-          {/* Debug Pagination Info */}
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Pagination Debug:</h3>
-            <div className="text-xs text-blue-700 space-y-1">
-              <div>Loading: {loading ? 'true' : 'false'}</div>
-              <div>Current Page: {currentPage}</div>
-              <div>Total Pages: {totalPages}</div>
-              <div>Total Count: {totalCount}</div>
-              <div>Items Per Page: {itemsPerPage}</div>
-              <div>Products Length: {products.length}</div>
-              <div>Show Pagination: {(!loading && totalPages > 1).toString()}</div>
-            </div>
-          </div>
+          
         </div>
 
         {/* Actions Bar */}
