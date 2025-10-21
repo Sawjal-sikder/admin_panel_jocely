@@ -74,7 +74,7 @@ const Product = () => {
       let response;
       try {
         // Try with standard pagination parameters first
-        let url = `/shop/products/list/?page=${page}&page_size=${limit}`;
+        let url = `/shop/products/list/admin/?page=${page}&page_size=${limit}`;
         if (search && search.trim()) {
           url += `&search=${encodeURIComponent(search.trim())}`;
         }
@@ -84,7 +84,7 @@ const Product = () => {
         
         try {
           // Try with limit instead of page_size
-          let url = `/shop/products/list/?page=${page}&limit=${limit}`;
+          let url = `/shop/products/list/admin/?page=${page}&limit=${limit}`;
           if (search && search.trim()) {
             url += `&search=${encodeURIComponent(search.trim())}`;
           }
@@ -93,7 +93,7 @@ const Product = () => {
           console.log('Second attempt failed, trying basic endpoint:', secondError.response?.status);
           
           // Try basic endpoint without pagination for now
-          response = await api.get('/shop/products/list/');
+          response = await api.get('/shop/products/list/admin/');
         }
       }
 
