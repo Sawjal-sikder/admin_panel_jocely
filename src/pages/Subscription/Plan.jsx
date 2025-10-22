@@ -16,6 +16,7 @@ import {
   MoreVertical,
   CreditCard
 } from 'lucide-react';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const Plan = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +28,7 @@ const Plan = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const {success} = useNotification();
 
   const handleCloseCreateModal = () => {
     setCreateModalOpen(false);
@@ -36,6 +38,7 @@ const Plan = () => {
     // Trigger a refresh to fetch updated data from the server
     setRefreshTrigger(prev => prev + 1);
     setCreateModalOpen(false);
+    success('Plan created successfully');
   };
 
   // Fetch plans from API
@@ -88,6 +91,7 @@ const Plan = () => {
     setRefreshTrigger(prev => prev + 1);
     setEditModalOpen(false);
     setSelectedPlan(null);
+    success('Plan updated successfully');
   };
 
   const filteredPlans = (Array.isArray(plans) ? plans : []).filter(plan => {

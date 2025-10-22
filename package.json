@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^5.27.6",
     "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
     "lucide-react": "^0.544.0",

@@ -15,6 +15,7 @@ import {
   Eye,
   MoreVertical
 } from 'lucide-react';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,6 +27,9 @@ const Users = () => {
   // for user edit
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // Get notification function at component level
+  const { success } = useNotification();
 
   // Transform API data to match the expected format for the UI
   const transformUserData = (apiUser) => {
@@ -110,23 +114,8 @@ const Users = () => {
   const handleUserUpdate = (updatedUserData) => {
     // Refresh the entire users list from API to ensure consistency
     fetchUsers();
-    
-    // Alternative: Update local state (commented out for now)
-    /*
-    setUsers(prevUsers => {
-      const updatedUsers = prevUsers.map(user => {
-        if (user.id === updatedUserData.id) {
-          const transformedUpdatedUser = transformUserData(updatedUserData);
-          console.log('Updating user from:', user);
-          console.log('To:', transformedUpdatedUser);
-          return transformedUpdatedUser;
-        }
-        return user;
-      });
-      console.log('Final users list:', updatedUsers);
-      return [...updatedUsers];
-    });
-    */
+    // show success notification
+    success('User Updated', 'The user information has been successfully updated.');
   };
 
   return (

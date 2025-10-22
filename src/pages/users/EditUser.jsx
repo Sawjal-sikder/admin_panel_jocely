@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '../../components/ui/Button';
 import { API_BASE_URL } from '../../services/auth';
 import { X } from 'lucide-react';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const EditUser = ({ isOpen, onClose, user, onUserUpdate, useLocalUpdate = true }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const EditUser = ({ isOpen, onClose, user, onUserUpdate, useLocalUpdate = true }
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { Error } = useNotification();
 
   // Update form data when user changes
   useEffect(() => {
