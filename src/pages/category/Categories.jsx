@@ -15,26 +15,27 @@ import {
   Folder,
   Package
 } from 'lucide-react';
+import Create from './Create';
+import Update from './Update';
+import Delete from './Delete';
 
 const Categories = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     FetchCategories();
   }, []);
 
   const FetchCategories = async () => {
-    // Fetch categories from API
     try {
       setLoading(true);
-      console.log('Fetching categories from API...');
       const response = await api.get('/shop/categories/');
-      console.log('API Response:', response);
-      console.log('Response data:', response.data);
-      console.log('Data type:', typeof response.data);
-      console.log('Is array:', Array.isArray(response.data));
       
       const data = response.data;
       
@@ -42,86 +43,24 @@ const Categories = () => {
       let categoriesData = data;
       if (data && data.results) {
         categoriesData = data.results;
-        console.log('Using nested results:', categoriesData);
       } else if (data && data.data) {
         categoriesData = data.data;
-        console.log('Using nested data:', categoriesData);
       }
       
       // Ensure data is an array before setting it
       const finalCategories = Array.isArray(categoriesData) ? categoriesData : [];
-      console.log('Final categories to set:', finalCategories);
       setCategories(finalCategories);
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      // Set empty array on error to prevent filter issues
       setCategories([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Mock data - in a real app, this would come from an API
-  // const [categories] = useState([
-  //   {
-  //     id: 1,
-  //     name: 'Electronics',
-  //     description: 'Electronic devices and gadgets',
-  //     productCount: 15,
-  //     status: 'Active',
-  //     createdAt: '2023-12-01',
-  //     updatedAt: '2024-01-10',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Clothing',
-  //     description: 'Apparel and fashion items',
-  //     productCount: 8,
-  //     status: 'Active',
-  //     createdAt: '2023-12-05',
-  //     updatedAt: '2024-01-08',
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Home & Kitchen',
-  //     description: 'Home appliances and kitchen tools',
-  //     productCount: 12,
-  //     status: 'Active',
-  //     createdAt: '2023-12-10',
-  //     updatedAt: '2024-01-05',
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'Sports',
-  //     description: 'Sports equipment and accessories',
-  //     productCount: 0,
-  //     status: 'Inactive',
-  //     createdAt: '2023-12-15',
-  //     updatedAt: '2023-12-15',
-  //   },
-  //   {
-  //     id: 5,
-  //     name: 'Books',
-  //     description: 'Educational and recreational books',
-  //     productCount: 3,
-  //     status: 'Active',
-  //     createdAt: '2023-12-20',
-  //     updatedAt: '2024-01-01',
-  //   },
-  // ]);
-
   const filteredCategories = (Array.isArray(categories) ? categories : []).filter(category => 
     category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getStatusBadge = (status) => {
-    return status === 'Active' 
-      ? 'bg-green-100 text-green-800' 
-      : 'bg-gray-100 text-gray-800';
-  };
 
   const totalProducts = (Array.isArray(categories) ? categories : []).reduce((sum, category) => sum + (category.productCount || 0), 0);
 
@@ -198,7 +137,9 @@ const Categories = () => {
               />
             </div>
 
-            <Button className="flex items-center">
+            <Button className="flex items-center"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Category
             </Button>
@@ -230,14 +171,18 @@ const Categories = () => {
                 <Table.Body>
                   {filteredCategories.map((category) => (
                     <Table.Row key={category.id}>
-                      <Table.Cell>
+                      <Table.Cell allowWrap={true} className="max-w-xs">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <Folder className="h-5 w-5 text-primary-600" />
                           </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                            <div className="text-sm text-gray-500">{category.description}</div>
+                          <div className="space-y-1 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 leading-tight" title={category.name}>
+                              {category.name && category.name.length > 30 ? `${category.name.substring(0, 30)}...` : category.name}
+                            </div>
+                            <div className="text-xs text-gray-500 leading-tight" title={category.description}>
+                              {category.description && category.description.length > 50 ? `${category.description.substring(0, 50)}...` : category.description}
+                            </div>
                           </div>
                         </div>
                       </Table.Cell>
@@ -248,7 +193,11 @@ const Categories = () => {
                         </div>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(category.status)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          category.is_active 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
                           {category.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </Table.Cell>
@@ -257,18 +206,28 @@ const Categories = () => {
                       </Table.Cell>
                       <Table.Cell>
                         <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm">
+                          {/* <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
+                          </Button> */}
+                          <Button variant="ghost" size="sm"
+                          onClick={() => {
+                              setSelectedCategory(category);
+                              setIsUpdateModalOpen(true);
+                            }}
+                            >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm"
+                          onClick={() => {
+                              setSelectedCategory(category);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          {/* <Button variant="ghost" size="sm">
                             <MoreVertical className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </Table.Cell>
                     </Table.Row>
@@ -299,6 +258,40 @@ const Categories = () => {
             </>
           )}
         </Card>
+
+        {/* Create Category Modal */}
+        <Create
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreate={(newCategory) => {
+            setCategories((prev) => [...prev, newCategory]);
+          }}
+        />
+        {/* Update Category Modal */}
+        <Update
+          isOpen={isUpdateModalOpen}
+          category={selectedCategory}
+          onClose={() => {
+            setIsUpdateModalOpen(false);
+            setSelectedCategory(null);
+          }}
+          onUpdate={(updatedCategory) => {
+            FetchCategories();
+          }}
+          useLocalUpdate={false}
+        />
+        {/* Delete Category Modal */}
+        <Delete
+          isOpen={isDeleteModalOpen}
+          categoryId={selectedCategory ? selectedCategory.id : null}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedCategory(null);
+          }}
+          onDelete={() => {
+            FetchCategories();
+          }}
+        />
       </div>
     </Layout>
   );

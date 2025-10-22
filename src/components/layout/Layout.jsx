@@ -147,7 +147,7 @@ const SidebarContent = ({ navigation, currentPath }) => {
               fill="none"
             />
           </svg> */}
-          <span className="text-xl font-bold text-gray-900 tracking-tight">
+          <span className="text-xl font-bold text-gray-900 tracking-tight pt-12 pl-12">
             <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
           </span>
         </div>
