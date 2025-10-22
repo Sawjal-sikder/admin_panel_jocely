@@ -2,6 +2,7 @@ import axios from 'axios';
 
 // export const API_BASE_URL = 'https://chart.dsrt321.online/api';
 export const API_BASE_URL = 'http://10.10.7.76:14005/api';
+export const PIC_BASE_URL = 'http://10.10.7.76:14005';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

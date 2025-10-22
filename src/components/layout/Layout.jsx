@@ -101,7 +101,7 @@ const Layout = ({ children }) => {
               <div className="ml-3 relative">
                 <div className="flex items-center space-x-3">
                   <div className="text-sm text-right">
-                    <p className="text-gray-900 font-medium">{user?.name || 'Admin User'}</p>
+                    <p className="text-gray-900 font-medium">{user?.full_name || 'Admin User'}</p>
                     <p className="text-gray-500">{user?.email || 'admin@example.com'}</p>
                   </div>
                   <button
@@ -148,7 +148,9 @@ const SidebarContent = ({ navigation, currentPath }) => {
             />
           </svg> */}
           <span className="text-xl font-bold text-gray-900 tracking-tight pt-12 pl-12">
-            <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
+            <Link to="/">
+              <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
+            </Link>
           </span>
         </div>
       </div>
