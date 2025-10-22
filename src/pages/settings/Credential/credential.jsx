@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Card from '../../../components/ui/Card';
 import { Key, Eye, EyeOff, AlertCircle, Copy, Check } from 'lucide-react';
 import useFetchData from '../../../hooks/useFetchData';
+import UpdateModal from './Edit';
+import Create from './Create';
 
 const Credential = () => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedCredential, setSelectedCredential] = useState(null);
+
   const [credentialData, setCredentialData] = useState({
     OPENAI_API_KEY: '',
     STRIPE_PUBLISHABLE_KEY: '',
@@ -24,12 +30,12 @@ const Credential = () => {
     STRIPE_WEBHOOK_SECRET: false,
   });
 
-  const { data, loading, error } = useFetchData('/auth/cretiential/');
-  console.log('Fetched credential data:', data);
+  const { data, loading, error, refetch } = useFetchData('/auth/cretiential/');
   useEffect(() => {
     if (data && data.length > 0) {
       const credentials = data[0]; // Get the first object from the array
       setCredentialData({
+        id: credentials.id, // Add the ID to the credential data
         OPENAI_API_KEY: credentials.OPENAI_API_KEY || 'Not configured',
         STRIPE_PUBLISHABLE_KEY: credentials.STRIPE_PUBLISHABLE_KEY || 'Not configured',
         STRIPE_SECRET_KEY: credentials.STRIPE_SECRET_KEY || 'Not configured',
@@ -46,7 +52,7 @@ const Credential = () => {
   };
 
   const maskKey = (key) => {
-    if (!key || key === 'Not configured') return key;
+    if (!key || key === 'Not configured' || typeof key !== 'string') return key;
     return `${'*'.repeat(Math.max(0, key.length - 8))}${key.slice(-8)}`;
   };
 
@@ -115,16 +121,27 @@ const Credential = () => {
         <div className="space-y-6">
           <div className="border-b border-gray-200 pb-6">
             <div className="flex justify-end space-x-3 mb-4">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => {
+                  setSelectedCredential(credentialData);
+                  setIsEditModalOpen(true);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
                 Edit Credentials
               </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+              <button 
+                onClick={() => setIsAddModalOpen(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              >
                 Add Credentials
               </button>
             </div>
             
             <div className="space-y-4">
-              {Object.entries(credentialData).map(([keyName, value]) => (
+              {Object.entries(credentialData)
+                .filter(([keyName]) => keyName !== 'id') // Filter out the id field
+                .map(([keyName, value]) => (
                 <div key={keyName} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                   <div className="flex-1">
                     <label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -185,6 +202,21 @@ const Credential = () => {
           </div>
         </div>
       </Card.Content>
+      {/* for UpdateModal */}
+      <UpdateModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        credential={selectedCredential} 
+        onUpdate={refetch}
+      />
+      {/* for CreateModal */}
+      <Create 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        credential={null} 
+        onCreate={true}
+      />
+
     </Card>
   );
 }

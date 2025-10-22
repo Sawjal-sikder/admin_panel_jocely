@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { X, Key, Save, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import useUpdate from '../../../hooks/useUpdate';
+import React, { useState } from 'react';
+import { X, Key, AlertCircle, Eye, EyeOff, Plus } from 'lucide-react';
+import api from '../../../services/auth';
 import { useNotification } from '../../../contexts/NotificationContext';
 
-const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
-
-    const { updateData, loading, error, success, reset } = useUpdate();
-    const { success: notifySuccess, error: notifyError } = useNotification();
+const Create = ({ isOpen, onClose }) => {
+  const { success: notifySuccess, error: notifyError } = useNotification();
 
   const [formData, setFormData] = useState({
     OPENAI_API_KEY: '',
@@ -24,17 +22,6 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (credential) {
-      setFormData({
-        OPENAI_API_KEY: credential.OPENAI_API_KEY || '',
-        STRIPE_PUBLISHABLE_KEY: credential.STRIPE_PUBLISHABLE_KEY || '',
-        STRIPE_SECRET_KEY: credential.STRIPE_SECRET_KEY || '',
-        STRIPE_WEBHOOK_SECRET: credential.STRIPE_WEBHOOK_SECRET || '',
-      });
-    }
-  }, [credential]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -58,12 +45,12 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
     }));
   };
 
-  const validateForm = () => {
+  const validateFormForCreation = () => {
     const newErrors = {};
     
     Object.keys(formData).forEach(key => {
-      if (!formData[key].trim()) {
-        newErrors[key] = `${key.replace(/_/g, ' ')} is required`;
+      if (!formData[key] || !formData[key].trim()) {
+        newErrors[key] = `${key.replace(/_/g, ' ')} is required for creating credentials`;
       }
     });
     
@@ -71,51 +58,98 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleCreateCredentials = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
-
-    if (!credential?.id) {
-      notifyError('Credential ID is missing');
-      setErrors({ general: 'Unable to update: Credential ID is missing' });
+    if (!validateFormForCreation()) {
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const response = await updateData(`/auth/cretiential/${credential.id}/`, formData, 'PATCH');
+      const response = await api.post('/auth/cretiential/', formData);
         if (!response.success) {
-        notifyError('Failed to update credentials:', response.error);
+        notifyError('Failed to create credentials:', response.error);
         return;
       }
-      
-      // Call refetch to update the data after successful update
-      if (onUpdate) {
-        onUpdate();
-      }
-      
+      // Clear form and close modal after successful operation
+      clearFormData();
       onClose();
-      notifySuccess('Credentials updated successfully');
+      
+      if (existingResponse.data && existingResponse.data.length > 0) {
+        notifySuccess('Credentials have been updated successfully!');
+      } else {
+        notifySuccess('New credentials have been created and saved successfully!');
+      }
     } catch (error) {
-      notifyError('Error updating credentials:', error);
+      console.error('Full error object:', error);
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        
+        // Handle non_field_errors first (these are general errors from the backend)
+        if (errorData.non_field_errors && Array.isArray(errorData.non_field_errors)) {
+          const nonFieldErrorMessage = errorData.non_field_errors.join(', ');
+          notifyError('Error', nonFieldErrorMessage);
+          // Close modal after showing error notification
+          setTimeout(() => {
+            clearFormData();
+            onClose();
+          }, 200); 
+          return;
+        }
+        
+        // Handle validation errors for specific fields
+        const validationErrors = {};
+        Object.keys(errorData).forEach(field => {
+          if (field !== 'non_field_errors') { // Skip non_field_errors as we handled it above
+            if (Array.isArray(errorData[field])) {
+              validationErrors[field] = errorData[field].join(', ');
+            } else if (typeof errorData[field] === 'string') {
+              validationErrors[field] = errorData[field];
+            }
+          }
+        });
+        
+        if (Object.keys(validationErrors).length > 0) {
+          setErrors(validationErrors);
+          return;
+        }
+        
+        // Handle other error formats
+        const generalErrorMessage = errorData.message || errorData.detail || 'Failed to create credentials';
+        notifyError('Error', generalErrorMessage);
+        setErrors({ general: generalErrorMessage });
+      } else {
+        const generalErrorMessage = error.message || 'Failed to create credentials';
+        notifyError('Error', generalErrorMessage);
+        setErrors({ general: generalErrorMessage });
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleClose = () => {
+  const clearFormData = () => {
+    setFormData({
+      OPENAI_API_KEY: '',
+      STRIPE_PUBLISHABLE_KEY: '',
+      STRIPE_SECRET_KEY: '',
+      STRIPE_WEBHOOK_SECRET: '',
+    });
+    setShowKeys({
+      OPENAI_API_KEY: false,
+      STRIPE_PUBLISHABLE_KEY: false,
+      STRIPE_SECRET_KEY: false,
+      STRIPE_WEBHOOK_SECRET: false,
+    });
+    setErrors({});
+  };
+
+  const handleCloseModal = () => {
     if (!isLoading) {
-      setFormData({
-        OPENAI_API_KEY: '',
-        STRIPE_PUBLISHABLE_KEY: '',
-        STRIPE_SECRET_KEY: '',
-        STRIPE_WEBHOOK_SECRET: '',
-      });
-      setErrors({});
+      clearFormData();
       onClose();
     }
   };
@@ -128,13 +162,13 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <Key className="h-6 w-6 text-blue-600" />
+            <Key className="h-6 w-6 text-green-600" />
             <h2 className="text-xl font-semibold text-gray-900">
-              Edit API Credentials
+              Create API Credentials
             </h2>
           </div>
           <button
-            onClick={handleClose}
+            onClick={handleCloseModal}
             disabled={isLoading}
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
           >
@@ -143,15 +177,15 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
         </div>
 
         {/* Modal Content */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleCreateCredentials} className="p-6">
           <div className="space-y-6">
-            {/* Security Notice */}
-            <div className="flex items-start space-x-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+            {/* Create Form Notice */}
+            <div className="flex items-start space-x-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <Plus className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="text-sm font-medium text-amber-800">Security Notice</h4>
-                <p className="text-sm text-amber-700 mt-1">
-                  These credentials will be encrypted and stored securely. Never share them publicly or with unauthorized users.
+                <h4 className="text-sm font-medium text-green-800">Add New Credentials</h4>
+                <p className="text-sm text-green-700 mt-1">
+                  Enter your API credentials below. All credentials will be encrypted and stored securely for your application's use.
                 </p>
               </div>
             </div>
@@ -176,12 +210,12 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
                     type={showKeys[keyName] ? 'text' : 'password'}
                     value={value}
                     onChange={(e) => handleInputChange(keyName, e.target.value)}
-                    className={`w-full pr-12 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                    className={`w-full pr-12 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
                       errors[keyName] 
                         ? 'border-red-300 bg-red-50' 
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
-                    placeholder={`Enter your ${keyName.replace(/_/g, ' ').toLowerCase()}`}
+                    placeholder={`Enter your new ${keyName.replace(/_/g, ' ').toLowerCase()}`}
                     disabled={isLoading}
                   />
                   <button
@@ -211,7 +245,7 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
           <div className="flex items-center justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={handleCloseModal}
               disabled={isLoading}
               className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -220,17 +254,17 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Updating...</span>
+                  <span>Creating...</span>
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4" />
-                  <span>Update Credentials</span>
+                  <Plus className="h-4 w-4" />
+                  <span>Create Credentials</span>
                 </>
               )}
             </button>
@@ -241,4 +275,4 @@ const Edit = ({ isOpen, onClose, credential, onUpdate }) => {
   );
 };
 
-export default Edit;
+export default Create;
