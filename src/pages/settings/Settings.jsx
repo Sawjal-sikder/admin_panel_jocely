@@ -10,28 +10,15 @@ import {
   Globe, 
   Shield,
   Save,
-  Camera
+  Camera,
+  KeyRound
 } from 'lucide-react';
 import ChangePassword from './ChangePassword';
 import Profile from './Profile';
+import Credential from './Credential/credential';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  // const [profileData, setProfileData] = useState({
-  //   name: 'Admin User',
-  //   email: 'admin@example.com',
-  //   phone: '+1 234 567 8900',
-  //   company: 'Admin Panel Inc.',
-  //   bio: 'System administrator with over 5 years of experience.',
-  // });
-
-  // const [securityData, setSecurityData] = useState({
-  //   currentPassword: '',
-  //   newPassword: '',
-  //   confirmPassword: '',
-  //   twoFactorEnabled: true,
-  // });
-
   const [notificationData, setNotificationData] = useState({
     emailNotifications: true,
     pushNotifications: false,
@@ -42,7 +29,7 @@ const Settings = () => {
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'security', name: 'Security', icon: Lock },
-    // { id: 'notifications', name: 'Notifications', icon: Bell },
+    { id: 'credential', name: 'Credentials', icon: KeyRound },
     // { id: 'general', name: 'General', icon: Globe },
   ];
 
@@ -115,51 +102,8 @@ const Settings = () => {
               <ChangePassword />
                         )}
 
-            {activeTab === 'notifications' && (
-              <Card>
-                <Card.Header>
-                  <Card.Title>Notification Preferences</Card.Title>
-                  <p className="text-sm text-gray-600">
-                    Choose how you want to be notified about activity.
-                  </p>
-                </Card.Header>
-                <Card.Content>
-                  <div className="space-y-6">
-                    {Object.entries({
-                      emailNotifications: 'Email Notifications',
-                      pushNotifications: 'Push Notifications',
-                      smsNotifications: 'SMS Notifications',
-                      weeklyReports: 'Weekly Reports',
-                    }).map(([key, label]) => (
-                      <div key={key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{label}</p>
-                          <p className="text-sm text-gray-500">
-                            {key === 'emailNotifications' && 'Receive notifications via email'}
-                            {key === 'pushNotifications' && 'Get push notifications on your device'}
-                            {key === 'smsNotifications' && 'Receive important alerts via SMS'}
-                            {key === 'weeklyReports' && 'Get weekly summary reports'}
-                          </p>
-                        </div>
-                        <input
-                          type="checkbox"
-                          name={key}
-                          checked={notificationData[key]}
-                          onChange={handleNotificationChange}
-                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                        />
-                      </div>
-                    ))}
-
-                    <div className="flex justify-end">
-                      <Button onClick={handleSave}>
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Preferences
-                      </Button>
-                    </div>
-                  </div>
-                </Card.Content>
-              </Card>
+            {activeTab === 'credential' && (
+              <Credential />
             )}
 
             {activeTab === 'general' && (
