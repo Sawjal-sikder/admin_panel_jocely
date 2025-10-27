@@ -348,7 +348,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
                 placeholder="$ 00.0"
                 required
                 min="0"
-                step="1"
+                step="0.01"
               />
             </div>
             <div>
@@ -364,7 +364,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="$ 00.0"
                 min="0"
-                step="1"
+                step="0.01"
               />
             </div>
             <div>

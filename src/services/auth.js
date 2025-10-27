@@ -36,11 +36,8 @@ api.interceptors.response.use(
 export const authService = {
   login: async (credentials) => {
     try {
-      console.log('Attempting login with:', { email: credentials.email, password: '***' });
-      console.log('API endpoint:', `${API_BASE_URL}/auth/login/`);
       
       const response = await api.post('/auth/login/', credentials);
-      console.log('Login response:', response.data);
       
       const { access, refresh } = response.data;
       
@@ -56,7 +53,6 @@ export const authService = {
           // Add other user fields as needed
         };
         localStorage.setItem('user', JSON.stringify(userInfo));
-        console.log('Tokens and user saved to localStorage');
       }
       
       return {

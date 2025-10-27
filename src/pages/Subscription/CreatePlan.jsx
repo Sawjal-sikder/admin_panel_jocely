@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../components/ui/Button';
-import { API_BASE_URL } from '../../services/auth';
+import api, { API_BASE_URL } from '../../services/auth';
 import { X } from 'lucide-react';
 
 const CreatePlan = ({ isOpen, onClose, onSuccess }) => {
@@ -47,32 +47,51 @@ const CreatePlan = ({ isOpen, onClose, onSuccess }) => {
           setError(null);
     
           // Prepare the request body - amount should be in cents
+          const amountNumber = Number(formData.amount);
+          const amountCents = Number.isFinite(amountNumber) ? Math.round(amountNumber * 100) : 0;
+
+          // Build request body. If description is empty, use the plan name as description.
+          const trimmedDescription = (formData.description || '').toString().trim();
+          const trimmedName = (formData.name || '').toString().trim();
+
           const requestBody = {
             name: formData.name,
-            amount: Math.round(formData.amount * 100), // Convert to cents
+            amount: amountCents, // Convert to cents (we'll decide final amount format when sending)
             interval: formData.interval,
-            interval_count: parseInt(formData.interval_count),
-            description: formData.description,
-            trial_days: parseInt(formData.trial_days),
-            active: formData.active
+            interval_count: parseInt(formData.interval_count, 10) || 1,
+            trial_days: parseInt(formData.trial_days, 10) || 0,
+            active: !!formData.active,
           };
-    
-          const response = await fetch(`${API_BASE_URL}/payment/plans/`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-          });
-    
-          if (!response.ok) {
-            throw new Error('Failed to create plan');
+
+          if (trimmedDescription) {
+            requestBody.description = trimmedDescription;
+          } else if (trimmedName) {
+            requestBody.description = trimmedName;
           }
-    
-          const data = await response.json();
-          console.log('Plan created successfully:', data);
-          
+
+          const payload = {
+            ...requestBody,
+            amount: Number(formData.amount),
+          };
+
+          Object.keys(payload).forEach((key) => {
+            const val = payload[key];
+            if (val === '' || val === null || typeof val === 'undefined') {
+              delete payload[key];
+            }
+          });
+
+          const response = await api.post('/payment/plans/', payload);
+
+          const data = response?.data;
+
+          if (!(response.status >= 200 && response.status < 300)) {
+            const serverMessage = data?.message || data?.error || JSON.stringify(data) || `HTTP ${response.status}`;
+            console.error('Create plan failed:', response.status, data);
+            throw new Error(serverMessage || 'Failed to create plan');
+          }
+
+
           // Reset form
           setFormData({
             name: '',
