@@ -366,20 +366,29 @@ const Product = () => {
                     </Table.Cell>
                     <Table.Cell>
                       <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                        {product.image1 ? (
-                          <img 
-                            src={product.image1} 
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                          No Image
-                        </div>
+                        {(() => {
+                          const firstImage = product.image1 || product.image2 || product.image3;
+                          if (firstImage) {
+                            return (
+                              <img 
+                                src={firstImage} 
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.src = '';
+                                  e.target.style.display = 'none';
+                                  e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">No Image</div>';
+                                }}
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
+                                No Image
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
                     </Table.Cell>
                     <Table.Cell allowWrap={true} className="max-w-xs">
