@@ -48,6 +48,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
     image2: '',
     image3: '',
     price: '',
+    stock: 0,
     discount_price: '',
     type_of_product: '',
     is_active: true,
@@ -172,6 +173,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
       formDataToSend.append('description', formData.description || '');
       formDataToSend.append('category', formData.category || '');
       formDataToSend.append('price', formData.price || '');
+      formDataToSend.append('stock', formData.stock || 0);
       formDataToSend.append('discount_price', formData.discount_price || '');
       formDataToSend.append('type_of_product', formData.type_of_product || '');
       formDataToSend.append('is_active', formData.is_active);
@@ -202,7 +204,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
       }
       
       // Reset form and close modal
-      setFormData({ category: '', name: '', description: '', image1: '', image2: '', image3: '', price: '', discount_price: '', type_of_product: '', is_active: true });
+      setFormData({ category: '', name: '', description: '', image1: '', image2: '', image3: '', price: '', stock: 0, discount_price: '', type_of_product: '', is_active: true });
       setImageFiles({ image1: null, image2: null, image3: null });
       setImagePreviews({ image1: null, image2: null, image3: null });
       onClose();
@@ -245,7 +247,7 @@ const Create = ({ isOpen, onClose, onCreate }) => {
 
   const handleClose = () => {
     setError(null);
-    setFormData({ category: '', name: '', description: '', image1: '', image2: '', image3: '', price: '', discount_price: '', type_of_product: '', is_active: true });
+    setFormData({ category: '', name: '', description: '', image1: '', image2: '', image3: '', price: '', stock: 0, discount_price: '', type_of_product: '', is_active: true });
     setImageFiles({ image1: null, image2: null, image3: null });
     setImagePreviews({ image1: null, image2: null, image3: null });
     onClose();
@@ -349,6 +351,24 @@ const Create = ({ isOpen, onClose, onCreate }) => {
                 required
                 min="0"
                 step="0.01"
+              />
+            </div>
+            <div>
+              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">
+                Stock Quantity
+                <span className="text-red-500"> *</span>
+              </label>
+              <input
+                type="number"
+                id="stock"
+                name="stock"
+                value={formData.stock}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0"
+                required
+                min="0"
+                step="1"
               />
             </div>
             <div>

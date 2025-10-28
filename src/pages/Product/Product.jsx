@@ -49,6 +49,7 @@ const Product = () => {
       description: apiProduct.description || 'N/A',
       category: apiProduct.category || 'N/A',
       price: apiProduct.price || '0.00',
+      stock: Number(apiProduct.stock) || 0,
       discount_price: apiProduct.discount_price || null,
       discount_percentage: Number(apiProduct.discount_percentage) || 0,
       type_of_product: apiProduct.type_of_product || 'N/A',
@@ -155,6 +156,7 @@ const Product = () => {
         "description": `Sample product ${(page - 1) * limit + i + 1} for testing pagination`,
         "image1": null,
         "price": (Math.random() * 40 + 10).toFixed(2),
+        "stock": Math.floor(Math.random() * 100),
         "discount_price": Math.random() > 0.5 ? (Math.random() * 30 + 5).toFixed(2) : null,
         "type_of_product": ["Skin", "Makeup", "Hair", "Fragrance"][i % 4],
         "is_active": Math.random() > 0.3,
@@ -353,6 +355,7 @@ const Product = () => {
                   <Table.Header width="w-48 sm:w-64">Product Details</Table.Header>
                   <Table.Header width="w-20">Category</Table.Header>
                   <Table.Header width="w-24">Price</Table.Header>
+                  <Table.Header width="w-24">Stock</Table.Header>
                   <Table.Header width="w-20">Status</Table.Header>
                   <Table.Header width="w-24">Reviews</Table.Header>
                   <Table.Header width="w-20">Actions</Table.Header>
@@ -416,6 +419,11 @@ const Product = () => {
                           {product.discount_percentage}% OFF
                         </div>
                       )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <span className="text-sm text-gray-700">
+                        {Number(product.stock || 0 ).toLocaleString()} pcs
+                      </span>
                     </Table.Cell>
                     <Table.Cell>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
